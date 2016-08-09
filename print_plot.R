@@ -48,6 +48,8 @@ if(input_startup_stats=="y"){
   startup_stats_plot<-startup_stats_plot+guides(color=guide_legend(title="loc",override.aes=list(size=1)))
   startup_stats_plot<-startup_stats_plot+facet_grid(group1~.,scales="free_y")
   startup_stats_plot<-startup_stats_plot+geom_blank(data=facet_limit,aes(x=group2,y=lim))
+  startup_stats_plot<-startup_stats_plot+geom_text(data=startup_stats,aes(x=group2,y=median,label=round(median))
+                                                   ,vjust=.4,hjust=.4,check_overlap = TRUE,angle=20)
   print(startup_stats_plot)
   
 }
