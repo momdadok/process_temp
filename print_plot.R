@@ -4,8 +4,12 @@ library("ggplot2")
 
 min_limit<-data.frame(startup_stats$group1,startup_stats$group2,startup_stats$min*.95)
 max_limit<-data.frame(startup_stats$group1,startup_stats$group2,startup_stats$max*1.05)
-colnames(min_limit)<-c("group1","group2","facet_limit")
-colnames(max_limit)<-c("group1","group2","facet_limit")
+
+min_limit$batchtime<-0
+max_limit$batchtime<-200
+
+colnames(min_limit)<-c("group1","group2","lim","batch_time")
+colnames(max_limit)<-c("group1","group2","lim","batch_time")
 facet_limit<-rbind(min_limit,max_limit)
 
 composite_plotdata$loc<-factor(composite_plotdata$loc, levels=c("banbury","mill","scratch_in","sheeter_out","cal#1in","cal#1out","cal#2in","cal#2out"))
@@ -13,14 +17,14 @@ composite_plotdata$loc<-factor(composite_plotdata$loc, levels=c("banbury","mill"
 composite_plot<-ggplot(data=composite_plotdata[composite_plotdata$batch_time<200,],)+geom_line(aes(x=batch_time,y=temp,color=loc))
 composite_plot<-composite_plot+facet_wrap(~batch)+theme_bw()+theme(axis.text.x=element_text(angle=90))
 composite_plot<-composite_plot+scale_color_discrete(breaks=c("banbury","mill","scratch_in","sheeter_out","cal#1in","cal#1out","cal#2in","cal#2out"))
-composite_plot<-composite_plot+scale_y_continuous(limit=c(140,320))
+composite_plot<-composite_plot+geom_blank(data=facet_limit,aes(x=batch_time,y=lim))
 print(composite_plot)
 
 min_limit$time<-min(composite_plotdata[composite_plotdata$state==2,1]-5*60)
 max_limit$time<-max(composite_plotdata[composite_plotdata$state==2,1]+5*60)
 facet_limit<-rbind(min_limit,max_limit)
 
-colnames(facet_limit)<-c("loc","startup","temp","time")
+colnames(facet_limit)<-c("loc","startup","temp","batch_time","time")
 
 time_plot<-ggplot()+geom_point(data=composite_plotdata[composite_plotdata$state==2,],aes(x=time-3600*4,y=temp,color=loc))
 time_plot<-time_plot+theme_bw()+theme(axis.text.x=element_text(angle=90,size=15),
@@ -33,7 +37,7 @@ time_plot<-time_plot+guides(color=guide_legend(override.aes=list(size=5)))
 time_plot<-time_plot+geom_blank(data=facet_limit,aes(x=time-3600*4,y=temp))
 print(time_plot)
 
-colnames(facet_limit)<-c("group1","group2","lim","time")
+colnames(facet_limit)<-c("group1","group2","lim","batch_time","time")
 
 if(input_startup_stats=="y"){
   startup_stats_plot<-ggplot()+geom_crossbar(data=startup_stats,aes(x=group2,y=median,ymin=min,ymax=max,color=group1),width=.1)
