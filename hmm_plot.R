@@ -1,0 +1,5 @@
+library("ggplot2")
+hmm_plot<-ggplot(data=hmm_state)+geom_point(aes(x=time-3600*4,y=temp,color=factor(state)),size=0.5)+theme_bw()
+hmm_plot<-hmm_plot+theme(axis.text.x=element_text(angle=90))+scale_x_datetime(date_breaks = "10 min",date_labels = "%H:%M")+xlab("time")
+hmm_plot<-hmm_plot+guides(colour = guide_legend(override.aes = list(size=3)))
+print(hmm_plot)

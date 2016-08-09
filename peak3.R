@@ -5,7 +5,7 @@ input_complete<-"n"
 
 while (input_complete=="n"){
   data_source<-readline("input data source?    ")
-  path<-"c:/Users/Clai/Documents/EVA/L2_trial_080216/"
+  path<-"c:/Users/Clai/Documents/EVA/L2_trial_080316/"
   file_date<-format(date,"%m%d%y")
   file_path<-paste(path,data_source,"_",file_date,".txt",sep="")
   
@@ -87,11 +87,15 @@ while (input_complete=="n"){
       L2temp_plotdata$batch_time<-w 
       
       median_temp<-data.frame(loc=character(),mean=numeric(),stdev=numeric())
-      
-      banbury_plotdata<-L2temp_plotdata
+    
       banbury_peak<-raw_plotdata[batch$peaks$index,]
       cycle_time<-c(NA,(diff(banbury_peak$time)*60))
       banbury_peak$cycle_time<-cycle_time
+      
+      source('c:/Users/Clai/Documents/Line_2/banbury_mill_sep.R')
+      
+      banbury_plotdata<-L2temp_plotdata
+      
       median_temp<-data.frame(loc="banbury",t(quantile(banbury_peak$temp)),mean=mean(banbury_peak$temp),stdev=sd(banbury_peak$temp))
       colnames(median_temp)[2:6]<-c("min","1qr","median","3qr","max")
       
@@ -133,6 +137,7 @@ while (input_complete=="n"){
       
       L2temp_plotdata$batch<-short_banbury_plotdata$batch
       L2temp_plotdata$batch_time<-short_banbury_plotdata$batch_time
+      L2temp_plotdata$startup<-short_banbury_plotdata$startup
       
       s<-c()
       s<-ifelse(L2temp_plotdata$temp<(max(L2temp_plotdata$temp)*.75),1,2)

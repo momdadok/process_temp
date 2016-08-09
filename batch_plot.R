@@ -2,12 +2,9 @@ print(data_source)
 invisible(readline("hmm algorithum (depmixS4) at 2 states will be run.  Press [enter] to continue...."))
 
 states<-2
-library("depmixS4")
-set.seed(1)
-hmm<-depmix(temp~1,data=raw_plotdata,nstates=states,family=gaussian())
-hmm_fit<-fit(hmm,verbose=FALSE)
-hmm_post<-posterior(hmm_fit)
-hmm_state<-cbind(raw_plotdata,hmm_post)
+new_state<-2
+
+source("c:/Users/Clai/Documents/Line_2/hmm.R")
 
 state1_mean<-mean(hmm_state$temp[hmm_state$state==1])
 state2_mean<-mean(hmm_state$temp[hmm_state$state==2])
@@ -19,53 +16,28 @@ hmm_minstate<-hmm_state[hmm_state$state!=state,]
 hmm_maxstate$state<-2
 hmm_minstate$state<-1
 hmm_state<-rbind(hmm_minstate,hmm_maxstate)
+source("c:/Users/Clai/Documents/Line_2/hmm_plot.R")
 
-library("ggplot2")
-hmm_plot<-ggplot(data=hmm_state)+geom_point(aes(x=time-3600*4,y=temp,color=factor(state)),size=0.5)+theme_bw()
-hmm_plot<-hmm_plot+theme(axis.text.x=element_text(angle=90))+scale_x_datetime(date_breaks = "10 min",date_labels = "%H:%M")+xlab("time")
-hmm_plot<-hmm_plot+guides(colour = guide_legend(override.aes = list(size=3)))
-print(hmm_plot)
+source("c:/Users/Clai/Documents/Line_2/temp_sep_state.R")
 
 accept_hmm<-readline("accept hmm results? y/n         ")
 
 while(accept_hmm=="n"){
   states<-as.numeric(readline("input # of states:    "))
   print("hmm running.....")
-  set.seed(1)
-  hmm<-depmix(temp~1,data=raw_plotdata,nstates=states,family=gaussian())
-  hmm_fit<-fit(hmm,verbose=FALSE)
-  hmm_post<-posterior(hmm_fit)
-  hmm_state<-cbind(raw_plotdata,hmm_post)
-  hmm_plot<-ggplot(data=hmm_state)+geom_point(aes(x=time-3600*4,y=temp,color=factor(state)),size=0.5)+theme_bw()
-  hmm_plot<-hmm_plot+theme(axis.text.x=element_text(angle=90))+scale_x_datetime(date_breaks = "10 min",date_labels = "%H:%M")+xlab("time")
-  hmm_plot<-hmm_plot+guides(colour = guide_legend(override.aes = list(size=3)))
-  print(hmm_plot)
+  
+  source("c:/Users/Clai/Documents/Line_2/hmm.R")
+  source("c:/Users/Clai/Documents/Line_2/hmm_plot.R")
   
   library(psych)
   print(describeBy(hmm_state$temp,hmm_state$state))
   
-  addl_state<-readline("need additonal states separated via temp? y/n        ")
-  while(addl_state=="y"){
-    change_state<-as.numeric(readline("which state to change?     "))
-    temp_sep<-as.numeric(readline("temperature for break?      "))
-    new_state<-max(hmm_state$state)+1
-    hmm_state$state[hmm_state$state==change_state&hmm_state$temp>temp_sep]<-new_state
-    hmm_plot<-ggplot(data=hmm_state)+geom_point(aes(x=time-3600*4,y=temp,color=factor(state)),size=0.5)+theme_bw()
-    hmm_plot<-hmm_plot+theme(axis.text.x=element_text(angle=90))+scale_x_datetime(date_breaks = "10 min",date_labels = "%H:%M")+xlab("time")
-    hmm_plot<-hmm_plot+guides(colour = guide_legend(override.aes = list(size=3)))
-    print(hmm_plot)
-    addl_state<-readline("need additonal states separated via temp? y/n        ")
-  }
+  source("c:/Users/Clai/Documents/Line_2/temp_sep_state.R")
   
   accept_hmm<-readline("accept hmm results? y/n         ")
 }
 
 if(states>2){
-  if(exists("actual_hmm_state")==FALSE){
-    actual_hmm_state<-c()
-  }
-  insert_actual_hmm_state<-hmm_state[,1:4]
-  insert_actual_hmm_state$loc<-data_source
   
   hmm_hi<-readline("input high states, separated by comma (,):     ") 
   hmm_lo<-readline("input low states, separated by comma (,):      ")
@@ -89,18 +61,9 @@ if(states>2){
   hmm_minstate$state<-1
   hmm_state<-rbind(hmm_maxstate,hmm_minstate)
   hmm_state<-hmm_state[order(hmm_state$time),]
-  hmm_plot<-ggplot(data=hmm_state)+geom_point(aes(x=time-3600*4,y=temp,color=factor(state)),size=0.5)+theme_bw()
-  hmm_plot<-hmm_plot+theme(axis.text.x=element_text(angle=90))+scale_x_datetime(date_breaks = "10 min",date_labels = "%H:%M")+xlab("time")
-  hmm_plot<-hmm_plot+guides(colour = guide_legend(override.aes = list(size=3)))
-  print(hmm_plot)
   
-  save_actual_hmm<-readline("save actual hmm states? y/n          ")
+  source("c:/Users/Clai/Documents/Line_2/hmm_plot.R")
   
-  if(save_actual_hmm=="y"){
-    actual_hmm_state<-rbind(actual_hmm_state,insert_actual_hmm_state)
-    actual_hmm_path<-paste(path,"actual_hmm_state_",file_date,".txt",sep="")
-    write.table(actual_hmm_state,actual_hmm_path,sep="\t")
-  }
 }
 
 if(exists("state_used")==FALSE){
@@ -128,6 +91,7 @@ short_banbury_plotdata<-banbury_plotdata[1:dim(L2temp_plotdata)[1],]
 L2temp_plotdata$batch<-short_banbury_plotdata$batch
 L2temp_plotdata$batch_time<-short_banbury_plotdata$batch_time
 L2temp_plotdata$loc<-data_source
+L2temp_plotdata$startup<-short_banbury_plotdata$startup
 
 batch_time_0<-na.omit(L2temp_plotdata[L2temp_plotdata$batch_time==0,])
 View(batch_time_0)
@@ -140,10 +104,7 @@ if(calc_temp_stats=="y"){
   individual_median_temp<-data.frame(loc=data_source,t(quantile(hmm_maxstate$temp)),mean=mean(hmm_maxstate$temp),stdev=sd(hmm_maxstate$temp))
   colnames(individual_median_temp)[2:6]<-c("min","1qr","median","3qr","max")
   median_temp<-rbind(median_temp,individual_median_temp)
-  View(median_temp)
 }
-
-composite_plotdata$loc<-factor(composite_plotdata$loc, levels=c("banbury","mill","scratch_in","sheeter_out","cal#1in","cal#1out","cal#2in","cal#2out"))
 
 save_composite<-readline("save to composite data? y/n          ")
 
@@ -153,8 +114,18 @@ if(save_composite=="y"){
   composite_path<-paste(path,"composite_data_",file_date,".txt",sep="")
   write.table(composite_plotdata,composite_path,sep = "\t")
 }
+ 
+input_startup_stats<-readline("generate startup-based stats? y/n      ")   
+  
+if(input_startup_stats=="y"){
+  library(psych)
+  filtered_data<-composite_plotdata[composite_plotdata$state==2,]
+  startup_stats<-describeBy(filtered_data$temp,
+                            list(filtered_data$loc,filtered_data$startup),mat=TRUE)
+  View(startup_stats)
+}
 
-print_plot<-readline("print composite and time plot? y/n        ")
+print_plot<-readline("print composite,time,startup_stats plot? y/n        ")
 
 if(print_plot=="y"){
   library("ggplot2")
@@ -167,5 +138,7 @@ if(save_median=="y"){
   station_temp<-median_temp
   median_path<-paste(path,"station_temp_",file_date,".txt",sep="")
   write.table(station_temp,median_path,sep="\t")
-  print("remember to add date to file names before starting the next run")
+  startup_stats_path<-paste(path,"startup_stats_",file_date,".txt",sep="")
+  write.table(startup_stats,startup_stats_path,sep="\t")
+  print("files saved!")
 }
