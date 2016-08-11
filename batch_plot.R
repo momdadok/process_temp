@@ -96,6 +96,7 @@ L2temp_plotdata$startup<-short_banbury_plotdata$startup
 batch_time_0<-na.omit(L2temp_plotdata[L2temp_plotdata$batch_time==0,])
 View(batch_time_0)
 
+print(paste("there are ",max(composite_plotdata$batch), "batches"))
 invisible(readline("check View window for data separation.  Press [Enter] to continue..."))
 
 calc_temp_stats<-readline("calculate temperature stats?  y/n        ")

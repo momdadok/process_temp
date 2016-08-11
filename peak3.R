@@ -5,7 +5,7 @@ input_complete<-"n"
 
 while (input_complete=="n"){
   data_source<-readline("input data source?    ")
-  path<-"c:/Users/Clai/Documents/EVA/L2_trial_080316/"
+  path<-"c:/Users/Clai/Documents/Line_2/"
   file_date<-format(date,"%m%d%y")
   file_path<-paste(path,data_source,"_",file_date,".txt",sep="")
   

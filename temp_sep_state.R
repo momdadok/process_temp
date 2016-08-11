@@ -11,8 +11,10 @@ while(addl_state=="y"){
   addl_state<-readline("need additonal states separated via temp? y/n        ")
 }
 
-states<-new_state
-
+if(addl_state=="y"){
+  states<-new_state 
+} 
+ 
 if(exists("actual_hmm_state")==FALSE){
   actual_hmm_state<-c()
 }

@@ -48,7 +48,7 @@ if(input_startup_stats=="y"){
                                                strip.text.y=element_text(size=15),
                                                legend.text=element_text(size=15),
                                                legend.title=element_text(size=15,face="bold"))
-  startup_stats_plot<-startup_stats_plot+xlab("startup")+scale_x_continuous(breaks=c(1,2,3,4,5,6))
+  startup_stats_plot<-startup_stats_plot+xlab("startup")
   startup_stats_plot<-startup_stats_plot+guides(color=guide_legend(title="loc",override.aes=list(size=1)))
   startup_stats_plot<-startup_stats_plot+facet_grid(group1~.,scales="free_y")
   startup_stats_plot<-startup_stats_plot+geom_blank(data=facet_limit,aes(x=group2,y=lim))
@@ -56,5 +56,17 @@ if(input_startup_stats=="y"){
                                                    ,vjust=.4,hjust=.4,check_overlap = TRUE,angle=20)
   print(startup_stats_plot)
   
+  startup_stats_plot2<-ggplot()+geom_crossbar(data=startup_stats,aes(x=group1,y=median,ymin=min,ymax=max),width=.1)
+  startup_stats_plot2<-startup_stats_plot2+theme_bw()
+  startup_stats_plot2<-startup_stats_plot2+theme(axis.text.x=element_text(size=15),
+                                                 axis.title=element_text(size=15,face="bold"),
+                                                 strip.text.y=element_text(size=15),
+                                                 legend.text=element_text(size=15),
+                                                 legend.title=element_text(size=15,face="bold"))
+  startup_stats_plot2<-startup_stats_plot2+facet_grid(group2~.,scales="free_y")
+  startup_stats_plot2<-startup_stats_plot2+geom_text(data=startup_stats,color="red",size=5,aes(x=group1,y=median,label=round(median))
+                                                     ,vjust=-.3,hjust=.4,check_overlap = TRUE,angle=20)
+  
+  print(startup_stats_plot2)
 }
 
